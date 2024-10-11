@@ -11,7 +11,9 @@ Code source du projet
 ### Compte-rendu 
 Dossier contenant la liste de tous les comptes-rendus du projet
 ### Documents
-Article de recherche dans le domaine de l'obscuration d'images.
+Article de recherche dans le domaine de l'obscuration d'images
+### Présentation
+Dossier contenant chaques diaporamas réalisés pour ce projet
 
 ## Credits
 

@@ -1,2 +1,2 @@
-# S-curit-visuelle
+# Sécurité visuelle
 Projet image de sécurité visuelle

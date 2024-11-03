@@ -1,6 +1,6 @@
 #include <iostream>
-#include <Utils.cpp>
-#include <Image.cpp>
+#include <Utils.hpp>
+#include <Image.hpp>
 
 int main(int argc, char *argv[])
 {

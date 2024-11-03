@@ -10,6 +10,9 @@ using namespace glm;
     protected : type _##name = initval; \
     public : const type& name(){return _##name;};
 
+#define UnprotectedMember(type, name, initval) \
+    protected : type _##name = initval; \
+    public : type& name(){return _##name;};
 
 class Image
 {
@@ -17,8 +20,9 @@ class Image
     Member(ivec2, size, vec2(0))
     Member(uint, totalSize, 0)
     Member(dvec2, range, vec2(0.f, 255.f))
-    Member(std::vector<dvec3>, data, {})
     Member(std::string, originalFilename, "")
+    
+    UnprotectedMember(std::vector<dvec3>, data, {})
 
     public : 
 
@@ -27,7 +31,7 @@ class Image
 
         void save(std::string prefix);
 
-        double &operator()(int x, int y);
+        dvec3 &operator()(int x, int y);
 
         void setRange(dvec2 newRange);
 };

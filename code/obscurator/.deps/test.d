@@ -1,3 +1,3 @@
-test.out test.out: apps/test.cpp include/Utils.cpp include/Image.cpp
-include/Utils.cpp:
-include/Image.cpp:
+test.out test.out: apps/test.cpp include/Utils.hpp include/Image.hpp
+include/Utils.hpp:
+include/Image.hpp:

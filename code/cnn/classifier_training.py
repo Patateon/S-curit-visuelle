@@ -3,8 +3,7 @@ from sklearn import metrics
 import tensorflow as tf
 from tensorflow.keras import datasets, models, layers
 
-import numpy as np
-import tensorflow
+import os
 
 
 # Load dataset
@@ -41,8 +40,8 @@ model.add(layers.MaxPooling2D((2, 2)))
 model.add(layers.Conv2D(64, (3, 3), activation = 'relu'))
 model.add(layers.MaxPooling2D((2, 2)))
 
-# model.add(layers.Conv2D(128, (3, 3), activation = 'relu'))
-# model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(128, (3, 3), activation = 'relu'))
+model.add(layers.MaxPooling2D((2, 2)))
 
 model.add(layers.Flatten())
 model.add(layers.Dense(100, activation = 'relu'))
@@ -56,15 +55,25 @@ model.compile(optimizer = 'adam',
               metrics = ['accuracy'])
 
 batch_size = 512
-epochs = 8
+epochs = 24
 
+
+# Entrainement
 history = model.fit(x_train, y_train,
           batch_size = batch_size,
           epochs = epochs,
           verbose = True,
           validation_data = (x_test, y_test))
 
+# Evaluation sur le dataset de test
 score = model.evaluate(x_test, y_test, verbose = 0)
 
 print(f"Test loss : {score[0]:4.4f}")
 print(f"Test accuracy : {score[1]:4.4f}")
+
+
+# Sauvegarde du modèle
+model_name = f"image-classifier-{epochs}-{batch_size}.keras"
+model_save_location = os.path.join(os.path.dirname(__file__), "model", model_name)
+
+model.save(model_save_location)

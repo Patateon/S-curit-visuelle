@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
-#include <Utils.cpp>
+#include <Utils.hpp>
 
 std::string getFileExtension(const std::string &fileName)
 {

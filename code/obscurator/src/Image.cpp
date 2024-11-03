@@ -1,5 +1,5 @@
-#include <Image.cpp>
-#include <Utils.cpp>
+#include <Image.hpp>
+#include <Utils.hpp>
 #include <stb/stb_image.h>
 #include <stb/stb_image_write.h>
 #include <iostream>
@@ -53,4 +53,9 @@ void Image::save(std::string prefix)
     stbi_write_png(filename.c_str(), _size.x, _size.y, 3, tmpData.data(), 0);
 
     std::cout << TERMINAL_TIMER << "Saved image : " << TERMINAL_FILENAME << filename << TERMINAL_RESET << "\n";
+}
+
+dvec3 & Image::operator()(int x, int y)
+{
+    return _data[x*_size.y + y];
 }

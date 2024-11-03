@@ -39,17 +39,20 @@ int main(int argc, char *argv[])
     {
         Image img = in;
 
+        const int kernelSize = img.size().x/64;
+
         for(int i = 0; i < img.size().x; i++)
         for(int j = 0; j < img.size().y; j++)
         {
-            ivec2 beg = max(ivec2(0)  , ivec2(i, j) - img.size()/32);
-            ivec2 end = min(img.size(), ivec2(i, j) + img.size()/32);
+            
+            ivec2 beg = max(ivec2(0)  , ivec2(i, j) - kernelSize);
+            ivec2 end = min(img.size(), ivec2(i, j) + kernelSize);
 
             dvec3 sum(0);
 
             for(int k = beg.x; k < end.x; k++)
             for(int l = beg.y; l < end.y; l++)
-                sum += img(k, j);
+                sum += in(k, l);
             
             sum /= (float)((end.x-beg.x)*(end.y-beg.y));
 

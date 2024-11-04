@@ -22,30 +22,28 @@ Shape :
  - En entrée : (?, 28, 28, 3) 
  - En sortie : (10)
 
-Actuellement :
- - 3 couches de convolution avec 32, 64 et 128 filtres
- - Un MaxPooling2D de 2,2
- - Un dropout à 2 pour l'overfitting (à voir)
- - relu comme fonction d'activation et un softmax à la fin
-
 """
 
 model = models.Sequential()
 
 model.add(layers.Input((32, 32, 3)))
 
-model.add(layers.Conv2D(32, (3, 3), activation = 'relu'))
-model.add(layers.MaxPooling2D((2, 2)))
-
+model.add(layers.Conv2D(64, (3, 3), activation = 'relu'))
 model.add(layers.Conv2D(64, (3, 3), activation = 'relu'))
 model.add(layers.MaxPooling2D((2, 2)))
 
-# model.add(layers.Conv2D(128, (3, 3), activation = 'relu'))
-# model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(128, (3, 3), activation = 'relu'))
+model.add(layers.Conv2D(128, (3, 3), activation = 'relu'))
+model.add(layers.MaxPooling2D((2, 2)))
+
+model.add(layers.Conv2D(256, (3, 3), activation = 'relu'))
+model.add(layers.Conv2D(256, (3, 3), activation = 'relu'))
+model.add(layers.Conv2D(256, (3, 3), activation = 'relu'))
+model.add(layers.Conv2D(256, (3, 3), activation = 'relu'))
+model.add(layers.MaxPooling2D((2, 2)))
 
 model.add(layers.Flatten())
 model.add(layers.Dense(100, activation = 'relu'))
-model.add(layers.Dropout(0.1))
 model.add(layers.Dense(10, activation = 'softmax'))
 
 model.summary()
@@ -55,7 +53,7 @@ model.compile(optimizer = 'adam',
               metrics = ['accuracy'])
 
 batch_size = 512
-epochs = 64
+epochs = 4
 
 
 # Entrainement
@@ -73,7 +71,7 @@ print(f"Test accuracy : {score[1]:4.4f}")
 
 
 # Sauvegarde du modèle
-model_name = f"image-classifier-{epochs}-{batch_size}.keras"
+model_name = f"image-classifier-vgg-{epochs}-{batch_size}.keras"
 model_save_location = os.path.join(os.path.dirname(__file__), "model", model_name)
 
 model.save(model_save_location)

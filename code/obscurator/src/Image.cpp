@@ -49,7 +49,7 @@ void Image::save(std::string prefix)
         tmpData[i+2] = out.b;
     }
 
-    std::string filename = "../out/" + prefix + getNameOnlyFromPath(_originalFilename.c_str()) + ".png";
+    std::string filename = prefix + getNameOnlyFromPath(_originalFilename.c_str()) + ".png";
     stbi_write_png(filename.c_str(), _size.x, _size.y, 3, tmpData.data(), 0);
 
     std::cout << TERMINAL_TIMER << "Saved image : " << TERMINAL_FILENAME << filename << TERMINAL_RESET << "\n";
@@ -57,5 +57,5 @@ void Image::save(std::string prefix)
 
 dvec3 & Image::operator()(int x, int y)
 {
-    return _data[x*_size.y + y];
+    return _data[x*_size.x + y];
 }

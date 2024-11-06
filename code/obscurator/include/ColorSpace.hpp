@@ -27,5 +27,18 @@ namespace ColorSpaces
     )
 
 
+    ColorSpace(
+        sRGB,
+        {
+            colorm::Srgb tmp(colorm::Rgb(i.r, i.g, i.b));
+            o = *((dvec3*)(&tmp));
+        },
+        {
+            colorm::Rgb tmp(colorm::Srgb(i.r, i.g, i.b));
+            o = *((dvec3*)(&tmp));
+        }
+    )
+
+
 }
 

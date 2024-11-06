@@ -19,9 +19,10 @@ int main(int argc, char *argv[])
         Image img = in;
 
         for(auto &p : img.data())
-            p -= mod(p, dvec3(32));
+            p -= mod(p, dvec3(100));
 
-        img.save("NAIVE_LPB_CUT_[RGB]_");
+        // system("mkdir ../out/NAIVE_LPB_CUT_[RGB]");
+        img.save("../out/NAIVE_LPB_CUT_[RGB]/");
     }
     {
         Image img = in;
@@ -29,17 +30,44 @@ int main(int argc, char *argv[])
         ColorSpaces::YCrCb::apply(img);
 
         for(auto &p : img.data())
-            p -= mod(p, dvec3(32));
+            p -= mod(p, dvec3(100));
 
         ColorSpaces::YCrCb::inverse(img);
 
-        img.save("NAIVE_LPB_CUT_[YCrCb]_");
+        // system("mkdir ../out/NAIVE_LPB_CUT_[YCrCb]");
+        img.save("../out/NAIVE_LPB_CUT_[YCrCb]/");
     }
 
     {
         Image img = in;
 
-        const int kernelSize = img.size().x/64;
+        // ColorSpaces::sRGB::apply(img);
+
+        for(auto &p : img.data())
+        {
+            int rmod = 64;
+            int gmod = 8;
+            int bmod = 32;
+
+            p.r -= mod(p.r, (double)rmod);
+            p.g -= mod(p.g, (double)gmod);
+            p.b -= mod(p.b, (double)bmod);
+
+            p.r += rand()%rmod;
+            p.g += rand()%gmod;
+            p.b += rand()%bmod;
+        }
+
+        // ColorSpaces::sRGB::inverse(img);
+
+        // system("mkdir ../out/NAIVE_LPB_CUT_[YCrCb]");
+        img.save("../out/test/");
+    }
+
+    {
+        Image img = in;
+
+        const int kernelSize = img.size().x/32;
 
         for(int i = 0; i < img.size().x; i++)
         for(int j = 0; j < img.size().y; j++)
@@ -52,15 +80,18 @@ int main(int argc, char *argv[])
 
             for(int k = beg.x; k < end.x; k++)
             for(int l = beg.y; l < end.y; l++)
-                sum += in(k, l);
+                if((k+j)%4 == 1)
+                    sum += in(l, k);
             
-            sum /= (float)((end.x-beg.x)*(end.y-beg.y));
+            sum /= 0.25*(float)((end.x-beg.x)*(end.y-beg.y));
 
-            img(i, j) = sum;
+            img(j, i) = sum;
         }
 
-        img.save("NAIVE_HEAVY_BLUR_[RGB]_");
+        // system("mkdir ../out/NAIVE_HEAVY_BLUR_[RGB]");
+        img.save("../out/NAIVE_HEAVY_BLUR_[RGB]/");
     }
+
 
     return EXIT_SUCCESS;
 }

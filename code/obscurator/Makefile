@@ -18,17 +18,16 @@ APPSCPP := $(call rwildcard,apps,*.cpp)
 # APPSOBJ := $(APPSCPP:apps/%.cpp=obj/%.o)
 APPSEXE := $(APPSCPP:apps/%.cpp=%.out)
 
-
 DEPDIR := .deps
 DEPFLAGS_BASE = -MT $@ -MMD -MP -MF $(DEPDIR)
 DEPFLAGS = $(DEPFLAGS_BASE)/$*.d
 DEPFLAGSMAIN = $(DEPFLAGS_BASE)/main.d
 
 
-CFLAGS = -g -O3 -Wall -Iinclude 
+CFLAGS = -g -O3 -Wall -Iinclude -Wno-strict-aliasing
 
 .PRECIOUS: obj/%.o
-.PHONY: clean
+# .PHONY: clean
 
 build : $(APPSEXE)
 
@@ -44,4 +43,26 @@ rebuild : clean build
 
 clean :
 	@rm -f $(APPSEXE) obj/*.o .deps/*.d 
+
+
+IMAGE_DIR := ../images/10_TEST
+PROGRAM := ./naive.out
+FILES := $(wildcard $(IMAGE_DIR)/*)
+
+.PHONY: all_images FORCE
+
+all_images: $(FILES)
+
+$(FILES): FORCE
+	@$(PROGRAM) $@
+
+FORCE:
+
+# $(PROGRAM) $<
+
+# all_images:
+# 	@for file in $(wildcard $(IMAGE_DIR)/*); do \
+# 		echo "Processing $$file..."; \
+# 		$(PROGRAM) $$file; \
+# 	done
 

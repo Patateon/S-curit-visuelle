@@ -40,5 +40,17 @@ namespace ColorSpaces
     )
 
 
+    ColorSpace(
+        HSL,
+        {
+            colorm::Hsl tmp(colorm::Rgb(i.r, i.g, i.b));
+            o = *((dvec3*)(&tmp));
+        },
+        {
+            colorm::Rgb tmp(colorm::Hsl(i.r, i.g, i.b));
+            o = *((dvec3*)(&tmp));
+        }
+    )
+
 }
 

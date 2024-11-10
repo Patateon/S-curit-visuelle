@@ -23,28 +23,72 @@ Shape :
  - En sortie : (10)
 
 """
+def frac_max_pool(x):
+    return tf.nn.fractional_max_pool(x, [1.0, 1.41, 1.41, 1.0], pseudo_random=True, overlapping=True)[0]
 
 model = models.Sequential()
 
-model.add(layers.Input((32, 32, 3)))
+model.add(layers.Conv2D(filters=32, kernel_size=(3, 3), padding='same', kernel_initializer='he_uniform', input_shape=(32, 32, 3)))
+model.add(layers.LeakyReLU())
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(filters=32, kernel_size=(3, 3), padding='same', kernel_initializer='he_uniform'))
+model.add(layers.LeakyReLU())
+model.add(layers.BatchNormalization())
+#model.add(Lambda(frac_max_pool))  # frac_max_pool
+model.add(layers.Dropout(0.3))
 
-model.add(layers.Conv2D(64, (3, 3), activation = 'relu'))
-model.add(layers.Conv2D(64, (3, 3), activation = 'relu'))
-model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(filters=64, kernel_size=(3, 3), padding='same', kernel_initializer='he_uniform'))
+model.add(layers.LeakyReLU())
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(filters=64, kernel_size=(3, 3), padding='same', kernel_initializer='he_uniform'))
+model.add(layers.LeakyReLU())
+model.add(layers.BatchNormalization())
+model.add(layers.Lambda(frac_max_pool))  # frac_max_pool
+model.add(layers.Dropout(0.35))
 
-model.add(layers.Conv2D(128, (3, 3), activation = 'relu'))
-model.add(layers.Conv2D(128, (3, 3), activation = 'relu'))
-model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(filters=96, kernel_size=(3, 3), padding='same', kernel_initializer='he_uniform'))
+model.add(layers.LeakyReLU())
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(filters=96, kernel_size=(3, 3), padding='same', kernel_initializer='he_uniform'))
+model.add(layers.LeakyReLU())
+model.add(layers.BatchNormalization())
+model.add(layers.Lambda(frac_max_pool))  # frac_max_pool
+model.add(layers.Dropout(0.35))
 
-model.add(layers.Conv2D(256, (3, 3), activation = 'relu'))
-model.add(layers.Conv2D(256, (3, 3), activation = 'relu'))
-model.add(layers.Conv2D(256, (3, 3), activation = 'relu'))
-model.add(layers.Conv2D(256, (3, 3), activation = 'relu'))
-model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(filters=128, kernel_size=(3, 3), padding='same', kernel_initializer='he_uniform'))
+model.add(layers.LeakyReLU())
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(filters=128, kernel_size=(3, 3), padding='same', kernel_initializer='he_uniform'))
+model.add(layers.LeakyReLU())
+model.add(layers.BatchNormalization())
+model.add(layers.Lambda(frac_max_pool))  # frac_max_pool
+model.add(layers.Dropout(0.4))
 
-model.add(layers.Flatten())
-model.add(layers.Dense(100, activation = 'relu'))
-model.add(layers.Dense(10, activation = 'softmax'))
+model.add(layers.Conv2D(filters=160, kernel_size=(3, 3), padding='same', kernel_initializer='he_uniform'))
+model.add(layers.LeakyReLU())
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(filters=160, kernel_size=(3, 3), padding='same', kernel_initializer='he_uniform'))
+model.add(layers.LeakyReLU())
+model.add(layers.BatchNormalization())
+model.add(layers.Lambda(frac_max_pool))  # frac_max_pool
+model.add(layers.Dropout(0.45))
+
+model.add(layers.Conv2D(filters=192, kernel_size=(3, 3), padding='same', kernel_initializer='he_uniform'))
+model.add(layers.LeakyReLU())
+model.add(layers.BatchNormalization())
+model.add(layers.Conv2D(filters=192, kernel_size=(3, 3), padding='same', kernel_initializer='he_uniform'))
+model.add(layers.LeakyReLU())
+model.add(layers.BatchNormalization())
+model.add(layers.Lambda(frac_max_pool))  # frac_max_pool
+model.add(layers.Dropout(0.5))
+
+model.add(layers.Conv2D(filters=192, kernel_size=(1, 1), padding='same', kernel_initializer='he_uniform'))
+model.add(layers.LeakyReLU())
+model.add(layers.BatchNormalization())
+model.add(layers.GlobalAveragePooling2D())
+model.add(layers.Dense(units=10, kernel_initializer='he_uniform', activation='softmax'))
+
+
 
 model.summary()
 
@@ -52,8 +96,8 @@ model.compile(optimizer = 'adam',
               loss = 'sparse_categorical_crossentropy',
               metrics = ['accuracy'])
 
-batch_size = 512
-epochs = 4
+batch_size = 64
+epochs = 64
 
 
 # Entrainement

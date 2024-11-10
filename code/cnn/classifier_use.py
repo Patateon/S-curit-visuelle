@@ -35,7 +35,7 @@ def evaluateClass(model_path: str, image_path: str):
 
 
 if __name__ == "__main__":
-    model_name = f"image-classifier-24-512.keras"
+    model_name = f"image-classifier-vgg-64-64.keras"
     model_path = os.path.join(os.path.dirname(__file__), "model", model_name)
 
     image_path = os.path.join("images", "chat.jpg")

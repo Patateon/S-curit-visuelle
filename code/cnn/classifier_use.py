@@ -1,6 +1,11 @@
-import numpy as np
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import load_model
+import tensorflow as tf
+
+import sys
+
+import numpy as np
+import glob 
 
 import os
 
@@ -17,10 +22,13 @@ CIFAR_CLASS_NAME = {
     9: "truck"
 }
 
+def frac_max_pool(x):
+    return tf.nn.fractional_max_pool(x, [1.0, 1.41, 1.41, 1.0], pseudo_random=True, overlapping=True)[0]
+
 
 def evaluateClass(model_path: str, image_path: str):
 
-    model = load_model(model_path)
+    model = load_model(model_path, custom_objects={'frac_max_pool': frac_max_pool})
 
     img = image.load_img(image_path, target_size=(32, 32))
     img_array = image.img_to_array(img)
@@ -33,13 +41,57 @@ def evaluateClass(model_path: str, image_path: str):
 
     return predicted_class
 
+def evaluateClassFromModel(model, image_path: str):
+    img = image.load_img(image_path, target_size=(32, 32))
+    img_array = image.img_to_array(img)
+    img_array = np.expand_dims(img_array, axis=0)
+    img_max = img_array.max()
+    img_array = img_array / 255.0
 
-if __name__ == "__main__":
+    predictions = model.predict(img_array)
+    predicted_class = np.argmax(predictions, axis=1)
+
+    return predicted_class
+
+def main():
     model_name = f"image-classifier-vgg-64-64.keras"
     model_path = os.path.join(os.path.dirname(__file__), "model", model_name)
 
-    image_path = os.path.join("images", "chat.jpg")
+    custom_objects = {'frac_max_pool': frac_max_pool}
+    model = load_model(model_path, custom_objects)
 
-    predicted_class = evaluateClass(model_path, image_path)
+    # images_path_pattern = os.path.join(glob.escape("out"), glob.escape("NAIVE_HEAVY_BLUR_[RGB]"), "**")
 
-    print(f"Classe prédite : {predicted_class[0]} : {CIFAR_CLASS_NAME[predicted_class[0]]}")
+
+    assert len(sys.argv) == 2
+    assert os.path.isdir(sys.argv[1])
+
+    images_directory_path = sys.argv[1]
+    images_path_pattern = os.path.join(glob.escape(images_directory_path), "**")
+
+    images_path_expected = glob.glob(pathname=images_path_pattern, recursive=True)
+
+    images_path = []
+    for image_path in images_path_expected:
+        if os.path.isfile(image_path):
+            images_path.append(image_path)
+
+    tp = 0
+    numberOfImages = len(images_path)
+
+    assert numberOfImages == 100
+
+    for i in range(numberOfImages):
+        current_class = i//10
+        predicted_class = evaluateClassFromModel(model, images_path[i])
+        if predicted_class[0] == current_class:
+            tp += 1
+        print(f"Image : {images_path[i]} | "
+              + f"Classe prédite : {predicted_class[0]} : {CIFAR_CLASS_NAME[predicted_class[0]]} | "
+              + f"Classe attendu : {current_class} : {CIFAR_CLASS_NAME[current_class]}")
+
+    accuracy = tp / numberOfImages
+    print(f"Accuracy : {accuracy}")
+
+if __name__ == "__main__":
+    main()

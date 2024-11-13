@@ -23,6 +23,12 @@ python -m venv /path/to/environnement/
 source /path/to/environnement/bin/activate
 ```
 
+### Installation des paquets
+
+```
+pip install -r /path/to/this/repository/cnn/requirement.txt
+```
+
 ### Utilisation sur un dossier de 100 images
 
 On attend un dossier de 100, 10 images par classes.

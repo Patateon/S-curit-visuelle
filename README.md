@@ -28,7 +28,7 @@ source /path/to/environnement/bin/activate
 On attend un dossier de 100, 10 images par classes.
 
 ```
-python classifier_use.py /path/to/images/directory
+python classifier_use.py /path/to/images/directory/
 ```
 
 ## Arborescence 

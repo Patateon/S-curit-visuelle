@@ -46,7 +46,7 @@ clean :
 
 
 IMAGE_DIR := ../images/10_TEST
-PROGRAM := ./naive.out
+PROGRAM := ./mix.out
 FILES := $(wildcard $(IMAGE_DIR)/*)
 
 .PHONY: all_images FORCE

@@ -9,6 +9,8 @@ import glob
 
 import os
 
+from PIL import Image  # Ensure PIL is imported for specifying interpolation
+
 CIFAR_CLASS_NAME = {
     0: "airplane",
     1: "automobile",
@@ -75,6 +77,8 @@ def main():
     for image_path in images_path_expected:
         if os.path.isfile(image_path):
             images_path.append(image_path)
+
+    images_path = sorted(images_path)
 
     tp = 0
     numberOfImages = len(images_path)

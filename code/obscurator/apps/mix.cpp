@@ -54,6 +54,11 @@ int main(int argc, char *argv[])
     if(!strcmp(tmpname.c_str(), "truck_"))
         replacement = "airplaine_";
 
+    std::string blurPlacement2 = "../out/NAIVE_HEAVY_BLUR_[RGB]/"
+        + replacement + number + ".png";
+
+    Image inBlur2(blurPlacement2.c_str());
+    
     replacement = 
     "../images/10_TEST/" 
     // "../out/NAIVE_HEAVY_BLUR_[RGB]/"
@@ -66,10 +71,6 @@ int main(int argc, char *argv[])
 
     Image inBlur(blurPlacement.c_str());
 
-    std::string blurPlacement2 = "../out/NAIVE_HEAVY_BLUR_[RGB]/"
-        + replacement + number + ".png";
-
-    Image inBlur2(blurPlacement.c_str());
 
     // {
     //     Image img = in;
@@ -129,6 +130,25 @@ int main(int argc, char *argv[])
         Image img = in;
         Image img2 = in2;
 
+        Image imgHSL = in;
+        Image imgHSL2 = in2;
+        Image imgBlurHSL = inBlur; 
+        Image imgBlurHSL2 = inBlur2; 
+
+
+        // ColorSpaces::sRGB::apply(in);
+        // ColorSpaces::sRGB::apply(in2);
+        // ColorSpaces::sRGB::apply(img);
+        // ColorSpaces::sRGB::apply(img2);
+        // ColorSpaces::sRGB::apply(inBlur);
+        // ColorSpaces::sRGB::apply(inBlur2);
+
+        ColorSpaces::HSL::apply(imgHSL);
+        ColorSpaces::HSL::apply(imgHSL2);
+        ColorSpaces::HSL::apply(imgBlurHSL);
+        ColorSpaces::HSL::apply(imgBlurHSL2);
+
+
         for(int i = 0; i < img.size().x; i++)
         for(int j = 0; j < img.size().y; j++)
         {
@@ -140,13 +160,56 @@ int main(int argc, char *argv[])
             dvec3 p2 = in2(j, i);
             dvec3 b2 = inBlur2(j, i);
 
-            dvec3 freq1 = clamp(length(p1-b1)/dvec3(255), dvec3(0), dvec3(1));
-            dvec3 freq2 = clamp(length(p2-b2)/dvec3(255), dvec3(0), dvec3(1));
+            dvec3 p1HSL = imgHSL(j, i);
+            dvec3 b1HSL = imgBlurHSL(j, i);
 
-            o = freq2*255.;
+            dvec3 p2HSL = imgHSL2(j, i);
+            dvec3 b2HSL = imgBlurHSL2(j, i);
 
+
+
+            float freq1 = clamp(length(p1-b1)/255., 0., 1.);
+            float freq2 = clamp(length(p2-b2)/255., 0., 1.);
+
+            // dvec3 rcol = dvec3(rand()%255, rand()%255, rand()%255);
+
+            /**
+             * Accuracy : 0.15
+            double a = (1.- pow(freq2, 1.0)) * (1. - pow(freq1, 0.5));
+            o = mix(p1, p2, a);
+             */
+
+            /**
+             * Accuracy 0.06
+            double noiseAlpha = 1. - pow(freq1, 0.5);
+            p1 = mix(p1, rcol, noiseAlpha*0.25);
+
+            if(rand()%4)
+                o = mix(p1, b2, dvec3(1, 0.75, 1));
+            else
+                o = p1;
+             */
+
+
+            double noiseAlpha = 1. - pow(freq1, 0.5);
+            // p1 = mix(p1, rcol, noiseAlpha*0.25);
+
+            dvec3 rcol = dvec3(rand()%360, rand()%100, rand()%100);
+            p1HSL = mix(p1HSL, rcol, noiseAlpha*0.35);
+
+            // double noiseAlpha2 = 1. - pow(freq2, 0.5); 
+
+
+            o = p2HSL;
+
+            // o = mix(p1HSL, p2HSL, 0.5);
+
+            o.b = p1HSL.b;
+            // o.b = 50.;
+            // o.g = 50.;
         }
 
+        ColorSpaces::HSL::inverse(img);
         img.save("../out/test/");
     }
 

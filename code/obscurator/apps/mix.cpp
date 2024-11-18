@@ -66,6 +66,11 @@ int main(int argc, char *argv[])
 
     Image inBlur(blurPlacement.c_str());
 
+    std::string blurPlacement2 = "../out/NAIVE_HEAVY_BLUR_[RGB]/"
+        + replacement + number + ".png";
+
+    Image inBlur2(blurPlacement.c_str());
+
     // {
     //     Image img = in;
 
@@ -108,52 +113,41 @@ int main(int argc, char *argv[])
             dvec3 p1 = img(j, i);
             dvec3 &o = img(j, i);
 
-            float d1 = (
-                + length(inBlur(j, i)-in(j, i)) 
-                // + length(inBlur(j, i)-in(j, i-1)) 
-                // + length(inBlur(j, i)-in(j-1, i)) 
-                // + length(inBlur(j, i)-in(j, i-1)) 
-                // + length(inBlur(j, i)-in(j, i+1)) 
-                // + length(inBlur(j, i)-in(j+1, i)) 
-                // + length(inBlur(j, i)-in(j+1, i+1)) 
-            // )/(441.67295593) 
-            )/255.
-            ;
+            float d1 = (length(inBlur(j, i)-in(j, i)) )/255.;
 
             r = 1. - pow(d1, 0.5);
 
-
-            // r = 1;
-            double a = r;
-            // a = pow(a, 1.25);
-            // a = smoothstep(0., 1., a);
-
-            if(true)
-            {
-                rcol = dvec3(rand()%255, rand()%255, rand()%255);
-
-                // rcol *= p1/255.;
-
-                // rcol = dvec3(
-                //     (rand()%(int)max(p1.r, 1.)), 
-                //     (rand()%(int)max(p1.g, 1.)), 
-                //     (rand()%(int)max(p1.b, 1.))
-                //     );
-                
-                // float scale = 1;
-                // rcol = dvec3(
-                //     perlin.octave2D_01(i*scale, j*scale, 4)*255.f, 
-                //     perlin.octave2D_01(i*scale + 64, j*scale + 64, 4)*255.f, 
-                //     perlin.octave2D_01(i*scale - 64, j*scale -64, 4)*255.f
-                // );
-            }
-            o = mix(p1, rcol, 0.6*a*dvec3(1, 1, 1));
-
-            // o = dvec3(r)*255.;
-
+            rcol = dvec3(rand()%255, rand()%255, rand()%255);
+            o = mix(p1, rcol, 0.6*r*dvec3(1, 1, 1));
         }
 
         img.save("../out/FREQUENCY_ATTACK/");
+    }
+
+    
+    {
+        Image img = in;
+        Image img2 = in2;
+
+        for(int i = 0; i < img.size().x; i++)
+        for(int j = 0; j < img.size().y; j++)
+        {
+            dvec3 &o = img(j, i);
+
+            dvec3 p1 = in(j, i);
+            dvec3 b1 = inBlur(j, i);
+
+            dvec3 p2 = in2(j, i);
+            dvec3 b2 = inBlur2(j, i);
+
+            dvec3 freq1 = clamp(length(p1-b1)/dvec3(255), dvec3(0), dvec3(1));
+            dvec3 freq2 = clamp(length(p2-b2)/dvec3(255), dvec3(0), dvec3(1));
+
+            o = freq2*255.;
+
+        }
+
+        img.save("../out/test/");
     }
 
     // {

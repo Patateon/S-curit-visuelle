@@ -2,9 +2,11 @@
 #include <Utils.hpp>
 #include <Image.hpp>
 #include <externalLibs/colorm.hpp>
+#include <externalLibs/PerlinNoise.hpp>
 #include <string>
 
 #include <ColorSpace.hpp>
+
 
 int main(int argc, char *argv[])
 {
@@ -52,9 +54,22 @@ int main(int argc, char *argv[])
     if(!strcmp(tmpname.c_str(), "truck_"))
         replacement = "airplaine_";
 
-    replacement = "../images/10_TEST/" + replacement + number + ".png";
+    replacement = 
+    "../images/10_TEST/" 
+    // "../out/NAIVE_HEAVY_BLUR_[RGB]/"
+    + replacement + number + ".png";
 
     Image in2(replacement.c_str());
+
+    std::string blurPlacement = "../out/NAIVE_HEAVY_BLUR_[RGB]/"
+        + getNameOnlyFromPath(argv[1]) + ".png";
+
+    Image inBlur(blurPlacement.c_str());
+
+    std::string blurPlacement2 = "../out/NAIVE_HEAVY_BLUR_[RGB]/"
+        + replacement + number + ".png";
+
+    Image inBlur2(blurPlacement.c_str());
 
     // {
     //     Image img = in;
@@ -71,28 +86,206 @@ int main(int argc, char *argv[])
     //     img.save("../out/test/");
     // }
 
+
+	const siv::PerlinNoise::seed_type seed = 123456u;
+	const siv::PerlinNoise perlin{ seed };
+
+    /****** 
+     * 
+     * RESULT : 0.11
+     * 
+     * WITHIN THE MARGIN OF ERROR FOR PERFECTLY RANDOM
+     * 
+     * VISUAL RESULT : MEH BUT VERY RECOGNIZABLE
+     * 
+     * ******/
     {
         Image img = in;
+        Image img2 = in2;
+
+        double r = 0;
+
+        dvec3 rcol(0);
 
         for(int i = 0; i < img.size().x; i++)
         for(int j = 0; j < img.size().y; j++)
         {
+            dvec3 p1 = img(j, i);
+            dvec3 &o = img(j, i);
+
+            float d1 = (length(inBlur(j, i)-in(j, i)) )/255.;
+
+            r = 1. - pow(d1, 0.5);
+
+            rcol = dvec3(rand()%255, rand()%255, rand()%255);
+            o = mix(p1, rcol, 0.6*r*dvec3(1, 1, 1));
+        }
+
+        img.save("../out/FREQUENCY_ATTACK/");
+    }
+
+    
+    {
+        Image img = in;
+        Image img2 = in2;
+
+        for(int i = 0; i < img.size().x; i++)
+        for(int j = 0; j < img.size().y; j++)
+        {
+            dvec3 &o = img(j, i);
+
             dvec3 p1 = in(j, i);
+            dvec3 b1 = inBlur(j, i);
+
             dvec3 p2 = in2(j, i);
+            dvec3 b2 = inBlur2(j, i);
 
-            double cut = 16;
+            dvec3 freq1 = clamp(length(p1-b1)/dvec3(255), dvec3(0), dvec3(1));
+            dvec3 freq2 = clamp(length(p2-b2)/dvec3(255), dvec3(0), dvec3(1));
 
-            p1 -= mod(p1, cut);
-            // p1 += mod(p2, 64.);
-            p1 += p2/(255./cut);
+            o = freq2*255.;
 
-            img(j, i) = p1;
-
-            // img(j, i) = mix(p1, p2, 0.25);
         }
 
         img.save("../out/test/");
     }
+
+    // {
+    //     Image img = in;
+    //     Image img2 = in2;
+
+    //     double r = 0;
+
+    //     dvec3 rcol(0);
+
+    //     // ColorSpaces::HSL::apply(img);
+    //     // ColorSpaces::HSL::apply(img2);
+
+    //     for(int i = 0; i < img.size().x; i++)
+    //     for(int j = 0; j < img.size().y; j++)
+    //     {
+    //         dvec3 p1 = img(j, i);
+    //         dvec3 p2 = img2(j, i);
+    //         dvec3 &o = img(j, i);
+
+    //         dvec3 lp1 = in(j, i-1);
+
+    //         // if(i%2 == 0 && j == 0)
+    //         //     r = rand()%255;
+
+    //         float d1 = (
+    //             + length(inBlur(j, i)-in(j, i)) 
+    //             + length(inBlur(j, i)-in(j, i-1)) 
+    //             + length(inBlur(j, i)-in(j-1, i)) 
+    //             + length(inBlur(j, i)-in(j, i-1)) 
+    //             + length(inBlur(j, i)-in(j, i+1)) 
+    //             + length(inBlur(j, i)-in(j+1, i)) 
+    //             + length(inBlur(j, i)-in(j+1, i+1)) 
+    //         )/(7.* 441.67295593) 
+    //         ;
+
+    //         // o = dvec3(d1)*255.;
+
+    //         // continue;
+
+
+    //         r = perlin.octave2D_01(i*1e-1, j*1e-1, 4);
+
+
+    //         // r *= pow(d1, 0.5);
+
+    //         r = 1. - pow(d1, 0.5);
+
+    //         // std::cout << r << "\n";
+
+    //         // r /= length(p1-lp1);
+
+    //         double a = r;
+
+    //         // a = pow(a, 5.);
+    //         a = pow(a, 2.0);
+    //         // a = smoothstep(0., 1., a);
+    //         // a = clamp(a*5., 0.0, 1.0);
+
+    //         o = mix(p1, p2, a*dvec3(1, 1, 1));
+
+    //         if(true)
+    //         {
+    //             rcol = dvec3(rand()%255, rand()%255, rand()%255);
+    //         }
+    //         o = mix(p1, rcol, 0.75*a*dvec3(1, 1, 1));
+
+    //         // o = dvec3(r*255.);
+
+    //         // o = mix(o, p2, 0.1);
+
+    //         // o = dvec3(d1*255.f);
+
+    //         // o.g = p1.g;
+    //     }
+
+        // ColorSpaces::HSL::inverse(img);
+        // ColorSpaces::HSL::inverse(img2);
+    // }
+
+    // {
+
+    //     Image img = in;
+    //     Image img2 = in2;
+
+    //     ColorSpaces::HSL::apply(img);
+    //     ColorSpaces::HSL::apply(img2);
+
+    //     for(int i = 0; i < img.size().x; i++)
+    //     for(int j = 0; j < img.size().y; j++)
+    //     {
+    //         dvec3 p1 = img(j, i);
+    //         dvec3 p2 = img2(j, i);
+    //         dvec3 &o = img(j, i);
+
+    //         // o = p1-p2;
+
+    //         o *= dvec3(0, 0, 1);
+    //         o += dvec3(0, 0, 0);
+
+    //         o.r = p2.r;
+    //         o.g = p2.g;
+
+    //         // double cut = 16;
+
+    //         // p1 -= mod(p1, cut);
+    //         // // p1 += mod(p2, 64.);
+    //         // p1 += p2/(255./cut);
+
+    //         // img(j, i) = p1;
+
+    //         // o = mix(p1, p2, 0.25);
+
+    //         // o = mix(p1, p2, 
+    //         //     dvec3(1, 0.25, 1) * 
+    //         //     (double)(rand()%128)/128.);
+
+    //         // o = p1;
+    //         // o.r = p2.r;
+    //         // o.g = p2.g;
+
+    //         // img(j, i) = o;
+
+    //         // if(rand()%4 == 0)
+    //         // {
+    //         //     o = p2; 
+    //         // }
+    //         // else
+    //         // {
+    //         //     o = p1;
+    //         // }
+    //     }
+
+    //     ColorSpaces::HSL::inverse(img);
+    //     ColorSpaces::HSL::inverse(img2);
+
+    //     img.save("../out/test/");
+    // }
 
 
     return EXIT_SUCCESS;

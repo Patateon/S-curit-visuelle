@@ -6,13 +6,24 @@ int main(int argc, char *argv[])
 {
     ARGCCHECK(1, "[image]")
 
-    Image i(argv[1]);
+    Image in(argv[1]);
 
-    i.setRange(dvec2(0, 1));
-    i.setRange(dvec2(-1, 1));
-    i.setRange(dvec2(1, -1));
+    in.setRange(dvec2(0, 1));
+    in.setRange(dvec2(-1, 1));
+    in.setRange(dvec2(1, -1));
 
-    i.save("TEST_");
+    Image out = in;
+
+    for(int i = 0; i < out.size().x; i++)
+    for(int j = 0; j < out.size().y; j++)
+    {
+        dvec3 &o = out(j, i);
+
+    }
+
+    out.save("../images/");
+
+    // i.save("TEST_");
 
     return EXIT_SUCCESS;
 }

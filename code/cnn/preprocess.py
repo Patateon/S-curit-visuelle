@@ -2,6 +2,8 @@ import subprocess
 import os
 import shutil
 import logging
+import sys
+import glob
 
 # Init logger
 logging.basicConfig(format="%(asctime)s %(message)s", datefmt="%Y/%m/%d %I:%M:%S%p")
@@ -27,12 +29,13 @@ def run_makefile(target: str, makefile_path: str):
     command = ["make"]
     
     if makefile_path:
-        command += ["-f", makefile_path]
+        command += ["-C", os.path.dirname(makefile_path)]
+        # command += ["-f", makefile_path]
     
     if target:
         target_list = target.split(" ")
         command += (target_list)
-
+        
     LOG.info(command)
     
     try:
@@ -53,16 +56,16 @@ def blur_image(images_path):
 
     makefile_path = os.path.join(OBSCURATOR_PATH, "Makefile")
     blur_out_path = os.path.join(os.path.dirname(makefile_path), "blur.out")
+    
+    makefile_path = os.path.abspath(makefile_path)
+    blur_out_path = os.path.abspath(blur_out_path)
+    images_path = os.path.abspath(images_path)
 
     # First recompile blur.cpp
     run_makefile(target="-j", makefile_path=makefile_path)
 
     # Execute blur.cpp upon every images in images_path
-    LOG.info(images_path)
-    # 
-    makefile_target = f"-j all_images IMAGE_DIR=\"{images_path}\" PROGRAM=\"{blur_out_path}\""
-    LOG.info(makefile_target)
-
+    makefile_target = f"-j all_images PROGRAM={blur_out_path} IMAGE_DIR={images_path}"
     run_makefile(target=makefile_target, makefile_path=makefile_path)
 
 
@@ -70,6 +73,11 @@ def clear_tmp():
     """
     Clear the tmp directory.
     """
+    try:
+        os.mkdir(TMP_BLUR_DIR)
+    except OSError:
+        pass
+    
     to_remove = os.path.join(TMP_BLUR_DIR)
     remove_command = ["rm", "-r", "-f", to_remove]
 
@@ -95,9 +103,6 @@ def run_cnn():
     "requirements.txt" and the tmp directory contains 100 images.
     """
 
-    # Activate environnement
-    # WIP
-
     # Run CNN
     classify_command = ["python", CNN_EXEC_FILE, TMP_BLUR_DIR]
     try:
@@ -108,19 +113,24 @@ def run_cnn():
         LOG.error(e.stderr)
 
 def main():
-    test_path = r"/home/e20200008252/Cours/Securite-visuelle/code/out/NAIVE_LINE_NOISE"
-    images_path = os.path.join(SCRIPT_DIR, "..", "out", "NAIVE_HEAVY_BLUR_[RGB]")
+    
+    assert len(sys.argv) == 2
+    assert os.path.isdir(sys.argv[1])
+    
+    images_path = glob.escape(sys.argv[1])
+    images_abs_path = os.path.join(SCRIPT_DIR, images_path)
+    images_abs_path = os.path.abspath(images_abs_path)
 
     LOG.info("Clear tmp directory...")
     clear_tmp()
     LOG.info("tmp has been cleared.")
 
     LOG.info("Blurring images...")
-    blur_image(images_path)
+    blur_image(images_abs_path)
     LOG.info("Blur done.")
 
-    # LOG.info("CNN inferences...")
-    # run_cnn()
+    LOG.info("CNN inferences...")
+    run_cnn()
 
 if __name__ == "__main__":
     main()

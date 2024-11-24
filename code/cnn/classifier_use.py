@@ -30,10 +30,9 @@ def evaluateClass(model_path: str, image_path: str):
 
     model = load_model(model_path, custom_objects={'frac_max_pool': frac_max_pool})
 
-    img = image.load_img(image_path, target_size=(32, 32))
+    img = image.load_img(image_path, target_size=(32, 32), interpolation="bilinear")
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
-    img_max = img_array.max()
     img_array = img_array / 255.0
 
     predictions = model.predict(img_array)
@@ -45,7 +44,6 @@ def evaluateClassFromModel(model, image_path: str):
     img = image.load_img(image_path, target_size=(32, 32))
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
-    img_max = img_array.max()
     img_array = img_array / 255.0
 
     predictions = model.predict(img_array)
@@ -54,17 +52,14 @@ def evaluateClassFromModel(model, image_path: str):
     return predicted_class
 
 def main():
+    assert len(sys.argv) == 2
+    assert os.path.isdir(sys.argv[1])
+    
     model_name = f"image-classifier-vgg-64-64.keras"
     model_path = os.path.join(os.path.dirname(__file__), "model", model_name)
 
     custom_objects = {'frac_max_pool': frac_max_pool}
     model = load_model(model_path, custom_objects)
-
-    # images_path_pattern = os.path.join(glob.escape("out"), glob.escape("NAIVE_HEAVY_BLUR_[RGB]"), "**")
-
-
-    assert len(sys.argv) == 2
-    assert os.path.isdir(sys.argv[1])
 
     images_directory_path = sys.argv[1]
     images_path_pattern = os.path.join(glob.escape(images_directory_path), "**")

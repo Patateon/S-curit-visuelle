@@ -9,8 +9,6 @@ import glob
 
 import os
 
-from PIL import Image  # Ensure PIL is imported for specifying interpolation
-
 CIFAR_CLASS_NAME = {
     0: "airplane",
     1: "automobile",

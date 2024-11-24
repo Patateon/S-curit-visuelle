@@ -195,22 +195,25 @@ int main(int argc, char *argv[])
             // p1 = mix(p1, rcol, noiseAlpha*0.25);
 
             dvec3 rcol = dvec3(rand()%360, rand()%100, rand()%100);
-            p1HSL = mix(p1HSL, rcol, noiseAlpha*0.35);
+            p1HSL = mix(p1HSL, rcol, noiseAlpha*0.4);
 
             // double noiseAlpha2 = 1. - pow(freq2, 0.5); 
 
 
+            // o = p1HSL;
+            // o.g = 0;
+
             o = p2HSL;
+            o.b = p1HSL.b;
 
             // o = mix(p1HSL, p2HSL, 0.5);
 
-            o.b = p1HSL.b;
             // o.b = 50.;
             // o.g = 50.;
         }
 
         ColorSpaces::HSL::inverse(img);
-        img.save("../out/test/");
+        img.save("../out/HUE_SATURATION_ATTACK/");
     }
 
     // {

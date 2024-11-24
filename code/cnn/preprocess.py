@@ -77,9 +77,6 @@ def clear_tmp():
         os.mkdir(TMP_BLUR_DIR)
     except OSError:
         pass
-    
-    to_remove = os.path.join(TMP_BLUR_DIR)
-    remove_command = ["rm", "-r", "-f", to_remove]
 
     try:
         if os.path.exists(TMP_BLUR_DIR):
@@ -131,6 +128,8 @@ def main():
 
     LOG.info("CNN inferences...")
     run_cnn()
+    
+    clear_tmp()
 
 if __name__ == "__main__":
     main()

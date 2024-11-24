@@ -1,0 +1,28 @@
+FREQUENCY_ATTACK : {
+    no-blur : 0.13
+    blur : 0.79
+}
+HUE_SATURATION_ATTACK : {
+    no-blur : 0.04
+    blur : 0.36
+}
+NAIVE_HEAVY_BLUR_[RGB] : {
+    no-blur : 0.9
+    blur : 0.64
+}
+NAIVE_LINE_NOISE : {
+    no-blur : 0.19
+    blur : 0.79
+}
+NAIVE_LPB_CUT_[RGB] : {
+    no-blur : 0.46
+    blur : 0.73
+}
+NAIVE_LPB_CUT_[YCrCb] : {
+    no-blur : 0.23
+    blur : 0.37
+}
+NAIVE_WAVE_DIVIDE : {
+    no-blur : 0.11
+    blur : 0.21
+}

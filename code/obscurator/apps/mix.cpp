@@ -100,6 +100,7 @@ int main(int argc, char *argv[])
      * VISUAL RESULT : MEH BUT VERY RECOGNIZABLE
      * 
      * ******/
+    if(false)
     {
         Image img = in;
         Image img2 = in2;
@@ -125,7 +126,7 @@ int main(int argc, char *argv[])
         img.save("../out/FREQUENCY_ATTACK/");
     }
 
-    
+    if(false)
     {
         Image img = in;
         Image img2 = in2;
@@ -134,14 +135,6 @@ int main(int argc, char *argv[])
         Image imgHSL2 = in2;
         Image imgBlurHSL = inBlur; 
         Image imgBlurHSL2 = inBlur2; 
-
-
-        // ColorSpaces::sRGB::apply(in);
-        // ColorSpaces::sRGB::apply(in2);
-        // ColorSpaces::sRGB::apply(img);
-        // ColorSpaces::sRGB::apply(img2);
-        // ColorSpaces::sRGB::apply(inBlur);
-        // ColorSpaces::sRGB::apply(inBlur2);
 
         ColorSpaces::HSL::apply(imgHSL);
         ColorSpaces::HSL::apply(imgHSL2);
@@ -214,6 +207,178 @@ int main(int argc, char *argv[])
 
         ColorSpaces::HSL::inverse(img);
         img.save("../out/HUE_SATURATION_ATTACK/");
+    }
+
+
+    if(false)
+    {
+        Image img = in;
+        Image img2 = in2;
+
+        Image imgHSL = in;
+        Image imgHSL2 = in2;
+        Image imgBlurHSL = inBlur; 
+        Image imgBlurHSL2 = inBlur2; 
+
+        ColorSpaces::HSL::apply(imgHSL);
+        ColorSpaces::HSL::apply(imgHSL2);
+        ColorSpaces::HSL::apply(imgBlurHSL);
+        ColorSpaces::HSL::apply(imgBlurHSL2);
+
+        for(int i = 0; i < img.size().x; i++)
+        for(int j = 0; j < img.size().y; j++)
+        {
+            dvec3 &o = img(j, i);
+
+            dvec3 p1 = in(j, i);
+            dvec3 b1 = inBlur(j, i);
+
+            dvec3 p2 = in2(j, i);
+            dvec3 b2 = inBlur2(j, i);
+
+            dvec3 p1HSL = imgHSL(j, i);
+            dvec3 b1HSL = imgBlurHSL(j, i);
+
+            dvec3 p2HSL = imgHSL2(j, i);
+            dvec3 b2HSL = imgBlurHSL2(j, i);
+
+            float freq1 = clamp(length(p1-b1)/255., 0., 1.);
+            float freq2 = clamp(length(p2-b2)/255., 0., 1.);
+
+            double scale = 1e-2;
+            double scale2 = 5e-3;
+            double r = perlin.octave2D_01(i*scale, j*scale, 4);
+
+            dvec3 rcol = dvec3(
+                perlin.octave2D_01(-i*scale2, j*scale2, 4), 
+                perlin.octave2D_01(i*scale2, -j*scale2, 4), 
+                perlin.octave2D_01(-i*scale2, -j*scale2, 4));
+
+            double noiseAlpha = 1. - pow(freq1, 0.5);
+            p1HSL = mix(p1HSL, dvec3(rand()%360, rand()%100, rand()%100), 0.8*noiseAlpha);
+
+            o = mix(p1HSL, rcol*dvec3(360*5, 100, 100), 0.5*pow(r, 0.5)*dvec3(1, 1, 0.25));
+        }
+
+        ColorSpaces::HSL::inverse(img);
+        img.save("../out/PERLIN_HUE_SATURATION_ATTACK/");
+    }
+
+
+    /*
+        15%
+    */
+   if(false)
+    {
+        Image img = in;
+        Image img2 = in2;
+
+        Image imgHSL = in;
+        Image imgHSL2 = in2;
+        Image imgBlurHSL = inBlur; 
+        Image imgBlurHSL2 = inBlur2; 
+
+        ColorSpaces::HSL::apply(imgHSL);
+        ColorSpaces::HSL::apply(imgHSL2);
+        ColorSpaces::HSL::apply(imgBlurHSL);
+        ColorSpaces::HSL::apply(imgBlurHSL2);
+
+        for(int i = 0; i < img.size().x; i++)
+        for(int j = 0; j < img.size().y; j++)
+        {
+            dvec3 &o = img(j, i);
+
+            dvec3 p1 = in(j, i);
+            dvec3 b1 = inBlur(j, i);
+
+            dvec3 p2 = in2(j, i);
+            dvec3 b2 = inBlur2(j, i);
+
+            dvec3 p1HSL = imgHSL(j, i);
+            dvec3 b1HSL = imgBlurHSL(j, i);
+
+            dvec3 p2HSL = imgHSL2(j, i);
+            dvec3 b2HSL = imgBlurHSL2(j, i);
+
+            float freq1 = clamp(length(p1-b1)/255., 0., 1.);
+            float freq2 = clamp(length(p2-b2)/255., 0., 1.);
+
+            double scale = 1e-1;
+            double scale2 = 5e-3;
+            double r = perlin.octave2D_01(i*scale, j*scale, 4);
+
+            dvec3 rcol = dvec3(
+                perlin.octave2D_01(-i*scale2, j*scale2, 4), 
+                perlin.octave2D_01(i*scale2, -j*scale2, 4), 
+                perlin.octave2D_01(-i*scale2, -j*scale2, 4));
+
+            double noiseAlpha = 1. - pow(freq1, 0.5);
+            p1 = mix(p1, dvec3(rand()%255, rand()%255, rand()%255), 1*noiseAlpha);
+            o = mix(p1, rcol*255.,
+                clamp(
+                    pow(r, 0.5)*dvec3(1, 0.5, 1) 
+                    , dvec3(0), dvec3(1)
+                )
+             );
+        }
+
+        // ColorSpaces::HSL::inverse(img);
+        img.save("../out/test/");
+    }
+
+    {
+        Image img = in;
+        Image img2 = in2;
+
+        Image imgHSL = in;
+        Image imgHSL2 = in2;
+        Image imgBlurHSL = inBlur; 
+        Image imgBlurHSL2 = inBlur2; 
+
+        ColorSpaces::HSL::apply(imgHSL);
+        ColorSpaces::HSL::apply(imgHSL2);
+        ColorSpaces::HSL::apply(imgBlurHSL);
+        ColorSpaces::HSL::apply(imgBlurHSL2);
+
+        for(int i = 0; i < img.size().x; i++)
+        for(int j = 0; j < img.size().y; j++)
+        {
+            dvec3 &o = img(j, i);
+
+            dvec3 p1 = in(j, i);
+            dvec3 b1 = inBlur(j, i);
+
+            dvec3 p2 = in2(j, i);
+            dvec3 b2 = inBlur2(j, i);
+
+            dvec3 p1HSL = imgHSL(j, i);
+            dvec3 b1HSL = imgBlurHSL(j, i);
+
+            dvec3 p2HSL = imgHSL2(j, i);
+            dvec3 b2HSL = imgBlurHSL2(j, i);
+
+            float freq1 = clamp(length(p1-b1)/255., 0., 1.);
+            float freq2 = clamp(length(p2-b2)/255., 0., 1.);
+
+            double scale = 1e-1;
+            double scale2 = 5e-3;
+            double r = perlin.octave2D_01(i*scale, j*scale, 4);
+
+            dvec3 rcol = dvec3(
+                perlin.octave2D_01(-i*scale2, j*scale2, 4), 
+                perlin.octave2D_01(i*scale2, -j*scale2, 4), 
+                perlin.octave2D_01(-i*scale2, -j*scale2, 4));
+
+            double noiseAlpha = 1. - pow(freq1, 0.5);
+            p1 = mix(p1, dvec3(rand()%255, rand()%255, rand()%255), 1*noiseAlpha);
+
+            o = p1;
+            o.r = p2.r;
+            o.b = p2.b;
+        }
+
+        // ColorSpaces::HSL::inverse(img);
+        img.save("../out/test/");
     }
 
     // {

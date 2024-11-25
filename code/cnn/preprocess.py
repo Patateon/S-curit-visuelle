@@ -30,7 +30,6 @@ def run_makefile(target: str, makefile_path: str):
     
     if makefile_path:
         command += ["-C", os.path.dirname(makefile_path)]
-        # command += ["-f", makefile_path]
     
     if target:
         target_list = target.split(" ")
@@ -60,6 +59,9 @@ def blur_image(images_path):
     makefile_path = os.path.abspath(makefile_path)
     blur_out_path = os.path.abspath(blur_out_path)
     images_path = os.path.abspath(images_path)
+
+    # Make clean
+    # run_makefile(target="clean", makefile_path=makefile_path)
 
     # First recompile blur.cpp
     run_makefile(target="-j", makefile_path=makefile_path)

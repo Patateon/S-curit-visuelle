@@ -17,7 +17,7 @@ class Application(tk.Tk):
         self.title('Obscurator')
 
         # Resolution
-        self.geometry("640x480")
+        self.geometry("1024x640")
         self.resizable(0, 0)
         
         # Create a menu bar
@@ -46,10 +46,17 @@ class Application(tk.Tk):
         main_frame = tk.Frame(self)
         
         self.image_frame = tk.Frame(self)
-        self.canvas = tk.Canvas(self.image_frame, bg="gray", width=512, height=512)
         
-        self.image_frame.pack(expand=True)
-        self.canvas.pack(expand=True)
+        self.image_input = tk.Entry(self.image_frame)
+        self.image_open_button = tk.Button(self.image_frame,\
+            text="Open image...", command=self.open_file)
+        self.canvas = tk.Canvas(self.image_frame, width=512, height=512)
+        
+        self.image_input.pack(side="top")
+        self.image_open_button.pack(side="top")
+        self.canvas.pack(side="bottom")
+        
+        self.image_frame.pack(side="left")
         
         main_frame.pack()
         
@@ -58,7 +65,7 @@ class Application(tk.Tk):
         self.current_image = ImageTk.PhotoImage(Image.open(image_path))
         
         self.canvas.delete("all")
-        self.canvas.create_image(20, 20, anchor=tk.NW, image=self.current_image)
+        self.canvas.create_image(0, 0, anchor=tk.NW, image=self.current_image)
 
 
     def open_file(self):
@@ -77,7 +84,8 @@ class Application(tk.Tk):
         if self.image_frame is not None:
             self.display_image(path)
             
-        print(path)
+        self.image_input.delete(0, 'end')
+        self.image_input.insert(0, path)
 
 
     def open_dir(self):

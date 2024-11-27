@@ -28,5 +28,9 @@ NAIVE_WAVE_DIVIDE : {
 }
 PERLIN_HUE_SATURATION_ATTACK {
     no-blur : 0.09
-    blur : 0.14
+    blur : 0.13 
+}
+NON_LINEAR_RGB_PERLIN_ATTACK {
+    no-blur : 0.1 
+    blur : 0.15
 }

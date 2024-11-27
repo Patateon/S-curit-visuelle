@@ -258,6 +258,8 @@ int main(int argc, char *argv[])
             p1HSL = mix(p1HSL, dvec3(rand()%360, rand()%100, rand()%100), 0.8*noiseAlpha);
 
             o = mix(p1HSL, rcol*dvec3(360*5, 100, 100), 0.5*pow(r, 0.5)*dvec3(1, 1, 0.25));
+            // o = rcol*dvec3(360*5, 100, 100);
+            // o = 128.*pow(r, 0.5)*dvec3(1, 1, 0.25);
         }
 
         ColorSpaces::HSL::inverse(img);
@@ -320,6 +322,7 @@ int main(int argc, char *argv[])
                     , dvec3(0), dvec3(1)
                 )
              );
+            
         }
 
         // ColorSpaces::HSL::inverse(img);

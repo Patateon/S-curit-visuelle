@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
      * VISUAL RESULT : MEH BUT VERY RECOGNIZABLE
      * 
      * ******/
-    if(false)
+    // if(false)
     {
         Image img = in;
         Image img2 = in2;
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
         img.save("../out/FREQUENCY_ATTACK/");
     }
 
-    if(false)
+    // if(false)
     {
         Image img = in;
         Image img2 = in2;
@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
     }
 
 
-    if(false)
+    // if(false)
     {
         Image img = in;
         Image img2 = in2;
@@ -268,7 +268,7 @@ int main(int argc, char *argv[])
     /*
         15%
     */
-   if(false)
+//    if(false)
     {
         Image img = in;
         Image img2 = in2;
@@ -323,9 +323,10 @@ int main(int argc, char *argv[])
         }
 
         // ColorSpaces::HSL::inverse(img);
-        img.save("../out/test/");
+        img.save("../out/NON_LINEAR_RGB_PERLIN_ATTACK/");
     }
 
+    if(false)
     {
         Image img = in;
         Image img2 = in2;

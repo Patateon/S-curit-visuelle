@@ -9,6 +9,9 @@ import glob
 
 import os
 
+VGG_LIKE_NAME = f"image-classifier-vgg-64-64.keras"
+VGG_LIKE = os.path.join(os.path.dirname(__file__), "model", VGG_LIKE_NAME)
+    
 CIFAR_CLASS_NAME = {
     0: "airplane",
     1: "automobile",
@@ -55,11 +58,10 @@ def main():
     assert len(sys.argv) == 2
     assert os.path.isdir(sys.argv[1])
     
-    model_name = f"image-classifier-vgg-64-64.keras"
-    model_path = os.path.join(os.path.dirname(__file__), "model", model_name)
+    
 
     custom_objects = {'frac_max_pool': frac_max_pool}
-    model = load_model(model_path, custom_objects)
+    model = load_model(VGG_LIKE, custom_objects)
 
     images_directory_path = sys.argv[1]
     images_path_pattern = os.path.join(glob.escape(images_directory_path), "**")

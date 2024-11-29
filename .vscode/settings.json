@@ -52,6 +52,12 @@
         "sstream": "cpp",
         "*.inc": "cpp",
         "complex": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "__locale": "cpp",
+        "ios": "cpp",
+        "__split_buffer": "cpp",
+        "list": "cpp",
+        "queue": "cpp",
+        "span": "cpp"
     }
 }

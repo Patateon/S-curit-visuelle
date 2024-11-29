@@ -19,10 +19,10 @@ int main(int argc, char *argv[])
     // i.setRange(dvec2(1, -1));
 
     std::string tmpname = getNameOnlyFromPath(argv[1]); 
-    char number = tmpname.back();
+    char number = glm::clamp(tmpname.back(), '0', '9');
     tmpname.back() = '\0';
 
-    std::string replacement;
+    std::string replacement = "cat_";
 
     if(!strcmp(tmpname.c_str(), "airplaine_"))
         replacement = "dog_";
@@ -65,6 +65,8 @@ int main(int argc, char *argv[])
     + replacement + number + ".png";
 
     Image in2(replacement.c_str());
+
+
 
     std::string blurPlacement = "../out/NAIVE_HEAVY_BLUR_[RGB]/"
         + getNameOnlyFromPath(argv[1]) + ".png";
@@ -157,7 +159,6 @@ int main(int argc, char *argv[])
             dvec3 b1HSL = imgBlurHSL(j, i);
 
             dvec3 p2HSL = imgHSL2(j, i);
-            dvec3 b2HSL = imgBlurHSL2(j, i);
 
 
 

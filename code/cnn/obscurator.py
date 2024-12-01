@@ -1,6 +1,9 @@
 # Standard lib
 import os
+import subprocess
 import time
+import logging
+import shutil
 
 # Interface lib
 import tkinter as tk
@@ -9,6 +12,57 @@ from tkinter.filedialog import askopenfilename, asksaveasfilename, askdirectory
 
 # CNN Lib
 import classifier_use
+import preprocess
+
+#####################
+
+## PATH
+SCRIPT_DIR = os.path.dirname(__file__)
+TMP_DIR = os.path.join(SCRIPT_DIR, "..", "tmp")
+TMP_OBSCURATOR = os.path.join(TMP_DIR, "obscurator")
+OBSCURATOR_PATH = preprocess.OBSCURATOR_PATH 
+
+## Filters names
+FILTERS_NAME = {
+    'FREQUENCY_ATTACK': os.path.join(OBSCURATOR_PATH, "filter_frequency_attack.out"),
+    'HUE_SATURATION_ATTACK': os.path.join(OBSCURATOR_PATH, "filter_hue_sat_attack.out"),
+    'NAIVE_HEAVY_BLUR_RGB': os.path.join(OBSCURATOR_PATH, "filter_blur.out"),
+    'NAIVE_LINE_NOISE': os.path.join(OBSCURATOR_PATH, "filter_line_noise.out"),
+    'NAIVE_LPB_CUT_RGB': os.path.join(OBSCURATOR_PATH, "filter_RGB_cut.out"),
+    'NAIVE_LPB_CUT_YCrCb': os.path.join(OBSCURATOR_PATH, "filter_YCrCb.out"),
+    'NAIVE_WAVE_DIVIDE': os.path.join(OBSCURATOR_PATH, "filter_wave_divide.out"),
+    'PERLIN_HUE_SATURATION_ATTACK': os.path.join(OBSCURATOR_PATH, "filter_perlin_hue_sat"),
+    'NON_LINEAR_RGB_PERLIN_ATTACK': os.path.join(OBSCURATOR_PATH, "filter_perlin_rgb.out"), 
+}
+
+#####################
+
+# Init logger
+logging.basicConfig(format="%(asctime)s %(message)s", datefmt="%Y/%m/%d %I:%M:%S%p")
+LOG = logging.getLogger("Python | {file_name}".format(file_name=__name__))
+LOG.setLevel(level=logging.DEBUG)
+
+
+def use_filter(filter_name: str, image_input: str, image_output: str):
+    """
+    Use the specified filter over an image and save his output.
+    
+    :params:
+    :param filter_name: name of an existing filter inside of "obscurator"
+    :param image_input: relative or absolute location of an image
+    :param image_output: relative or absolute location to save image
+    """
+    
+    if filter_name not in FILTERS_NAME:
+        LOG.debug(f"Filter is not available {filter_name}")
+        return
+    
+    filter_path = FILTERS_NAME[filter_name]
+    
+    subprocess
+    
+    
+    pass
 
 class Application(tk.Tk):
 
@@ -16,24 +70,68 @@ class Application(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-        # Title
+        
+        ## Initialize variables
+        self.current_image = None
+        self.current_image_path = None
+          
+        ## Basic window settings
+        # Change Title
         self.title('Obscurator')
 
-        # Resolution
+        # Change Resolution
         self.geometry("1050x720")
         self.resizable(0, 0)
         
+        ## Initialisation routines
+        # Clear tmp directory
+        self.clear_tmp_obscurator()
+        
+        # Compile filters
+        self.clean_and_recompile()
+        
+        ## Load UI
         # Create a menu bar
         self.create_menu_bar()
         
-        self.initialise_variables()
-        
         # Initialize the main frame 
         self.scene_initializer()
+        
+    def clear_tmp_obscurator(self):
+        """ 
+        Clear "tmp/obscurator" directory.
+        """
+        try:
+            os.mkdir(TMP_OBSCURATOR)
+        except OSError:
+            pass
 
-    def initialise_variables(self):
-        self.current_image = None
-        self.current_image_path = None
+        try:
+            if os.path.exists(TMP_OBSCURATOR):
+                for item in os.listdir(TMP_OBSCURATOR):
+                    item_path = os.path.join(TMP_OBSCURATOR, item)
+                    if os.path.isfile(item_path) or os.path.islink(item_path):
+                        os.unlink(item_path)
+                    elif os.path.isdir(item_path):
+                        shutil.rmtree(item_path)
+                LOG.info(f"Successfully cleared contents of: {TMP_OBSCURATOR}")
+            else:
+                LOG.info(f"Directory does not exist: {TMP_OBSCURATOR}")
+        except Exception as e:
+            LOG.info(f"Error while clearing contents of {TMP_OBSCURATOR}: {e}")
+    
+    def clean_and_recompile(self):
+        """
+        Clean and recompile filter cpp
+        """
+        
+        makefile_path = os.path.join(preprocess.OBSCURATOR_PATH, "Makefile")
+        
+        # Run a make clean with "obscurator/Makefile"
+        preprocess.run_makefile(target="clean", makefile_path=makefile_path)
+        
+        # Compile everything in apps with "obscurator/Makefile" make -j
+        preprocess.run_makefile(target="-j", makefile_path=makefile_path)
 
     def create_menu_bar(self):
         menu_bar = tk.Menu(self)

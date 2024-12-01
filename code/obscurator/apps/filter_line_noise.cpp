@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[])
 {
-    ARGCCHECK(1, "[image]")
+    ARGCCHECK(2, "[image_input image_output]")
 
     Image in(argv[1]);
 
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
         // ColorSpaces::YCrCb::inverse(img);
 
         // system("mkdir ../out/NAIVE_LPB_CUT_[YCrCb]");
-        img.save("result__");
+        img.save(argv[2]);
     }
 
     return EXIT_SUCCESS;

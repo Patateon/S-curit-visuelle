@@ -1,5 +1,7 @@
 # Standard lib
+from email.mime import base
 import os
+from re import sub
 import subprocess
 import time
 import logging
@@ -31,7 +33,7 @@ FILTERS_NAME = {
     'NAIVE_LPB_CUT_RGB': os.path.join(OBSCURATOR_PATH, "filter_RGB_cut.out"),
     'NAIVE_LPB_CUT_YCrCb': os.path.join(OBSCURATOR_PATH, "filter_YCrCb.out"),
     'NAIVE_WAVE_DIVIDE': os.path.join(OBSCURATOR_PATH, "filter_wave_divide.out"),
-    'PERLIN_HUE_SATURATION_ATTACK': os.path.join(OBSCURATOR_PATH, "filter_perlin_hue_sat"),
+    'PERLIN_HUE_SATURATION_ATTACK': os.path.join(OBSCURATOR_PATH, "filter_perlin_hue_sat.out"),
     'NON_LINEAR_RGB_PERLIN_ATTACK': os.path.join(OBSCURATOR_PATH, "filter_perlin_rgb.out"), 
 }
 
@@ -43,7 +45,7 @@ LOG = logging.getLogger("Python | {file_name}".format(file_name=__name__))
 LOG.setLevel(level=logging.DEBUG)
 
 
-def use_filter(filter_name: str, image_input: str, image_output: str):
+def apply_filter(filter_name: str, image_input: str, image_output: str):
     """
     Use the specified filter over an image and save his output.
     
@@ -55,14 +57,20 @@ def use_filter(filter_name: str, image_input: str, image_output: str):
     
     if filter_name not in FILTERS_NAME:
         LOG.debug(f"Filter is not available {filter_name}")
-        return
+        return False
     
     filter_path = FILTERS_NAME[filter_name]
     
-    subprocess
+    filter_command = [filter_path, image_input, image_output]
     
-    
-    pass
+    try:
+        result = subprocess.run(filter_command, check=True, text=True, capture_output=True)
+        LOG.debug(result.stdout)
+        return True
+    except subprocess.CalledProcessError as e:
+        LOG.error("Error while running filter:")
+        LOG.error(e.stderr)
+        return False
 
 class Application(tk.Tk):
 
@@ -74,6 +82,9 @@ class Application(tk.Tk):
         ## Initialize variables
         self.current_image = None
         self.current_image_path = None
+        self.filtered_image = None
+        self.filtered_image_path = None
+        self.current_filter = None
           
         ## Basic window settings
         # Change Title
@@ -190,12 +201,12 @@ class Application(tk.Tk):
         self.filter_controller = tk.Frame(self.filter_frame)
         
         self.filter_options = tk.StringVar(self)
-        self.filter_options_names = ('BLUR', 'FREQUENCY')
+        self.filter_options_names = list(FILTERS_NAME.keys())
         
         # Filter controllers
         self.scroller_filter = tk.OptionMenu(self.filter_controller,\
             self.filter_options, self.filter_options_names[0],\
-            *self.filter_options_names)
+            *self.filter_options_names, command=self.set_current_filter)
         self.apply_filter_button = tk.Button(self.filter_controller,\
             text="Apply Filter", command=self.apply_filter)
         
@@ -231,13 +242,37 @@ class Application(tk.Tk):
         self.canvas.delete("all")
         self.canvas.create_image(0, 0, anchor=tk.NW, image=self.current_image)
 
+    def set_current_filter(self, selected_filter):
+        LOG.info(f"Current filter: {selected_filter}")
+        self.current_filter = selected_filter
+
     def apply_filter(self):
         
-        if self.current_image is None:
+        if self.current_image is None\
+            or self.current_image_path is None:
+            LOG.info("There is no images")
             return
         
-        self.canvas_out.delete("all")
-        self.canvas_out.create_image(0, 0, anchor=tk.NW, image=self.current_image)
+        if self.current_filter is None:
+            LOG.info("Please select a filter")
+            return
+        
+        self.clear_tmp_obscurator()
+        
+        self.filtered_image_path = os.path.join(TMP_OBSCURATOR, "")
+        
+        is_filtered = apply_filter(self.current_filter, self.current_image_path, self.filtered_image_path)
+        
+        basename = os.path.basename(self.current_image_path)
+        basename = os.path.splitext(basename)[0] + ".png"
+        self.filtered_image_path = os.path.join(self.filtered_image_path, basename)
+        
+        if is_filtered:
+            self.filtered_image = ImageTk.PhotoImage(Image.open(self.filtered_image_path))
+                    
+            self.canvas_out.delete("all")
+            self.canvas_out.create_image(0, 0, anchor=tk.NW, image=self.filtered_image)
+
 
     def find_input_class(self):
         
@@ -251,11 +286,11 @@ class Application(tk.Tk):
         
     def find_output_class(self):
         
-        if self.current_image_path is None:
+        if self.filtered_image_path is None:
             return
         
         current_image_class = classifier_use.evaluateClass(\
-            classifier_use.VGG_LIKE, self.current_image_path)
+            classifier_use.VGG_LIKE, self.filtered_image_path)
         
         self.output_cnn_label['text'] = f"Class : {classifier_use.CIFAR_CLASS_NAME[current_image_class[0]]}"
         

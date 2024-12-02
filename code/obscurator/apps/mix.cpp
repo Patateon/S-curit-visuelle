@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
             r = 1. - pow(d1, 0.5);
 
             rcol = dvec3(rand()%255, rand()%255, rand()%255);
-            o = mix(p1, rcol, 0.6*r*dvec3(1, 1, 1));
+            o = mix(p1, rcol, 0.25*r*dvec3(1, 1, 1));
         }
 
         img.save("../out/FREQUENCY_ATTACK/");

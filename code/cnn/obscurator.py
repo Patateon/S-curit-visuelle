@@ -6,6 +6,7 @@ import subprocess
 import time
 import logging
 import shutil
+import numpy as np
 
 # Interface lib
 import tkinter as tk
@@ -164,8 +165,9 @@ class Application(tk.Tk):
         main_frame = tk.Frame(self)
 
 
+        self.images_container_frame = tk.Frame(main_frame)
         ## Setup Image frames and controller on the left side of the window
-        self.image_frame = tk.Frame(main_frame)
+        self.image_frame = tk.Frame(self.images_container_frame)
         
         self.image_frame_controller = tk.Frame(self.image_frame)
         
@@ -196,7 +198,7 @@ class Application(tk.Tk):
         self.image_frame.pack(side="left")
         
         ## Setup filter frame and controllers
-        self.filter_frame = tk.Frame(main_frame)
+        self.filter_frame = tk.Frame(self.images_container_frame)
         
         self.filter_controller = tk.Frame(self.filter_frame)
         
@@ -205,8 +207,9 @@ class Application(tk.Tk):
         
         # Filter controllers
         self.scroller_filter = tk.OptionMenu(self.filter_controller,\
-            self.filter_options, self.filter_options_names[0],\
-            *self.filter_options_names, command=self.set_current_filter)
+            self.filter_options, *self.filter_options_names,\
+            command=self.set_current_filter)
+        self.scroller_filter.config(width=40)
         self.apply_filter_button = tk.Button(self.filter_controller,\
             text="Apply Filter", command=self.apply_filter)
         
@@ -231,9 +234,25 @@ class Application(tk.Tk):
         
         self.filter_frame.pack(side="right")
         
+        # Log footer
+        self.images_container_frame.pack(side="top")
+        
+        self.log_frame = tk.Frame(main_frame)
+        
+        self.log_var = tk.StringVar()
+        self.log("Please open an image...")
+        
+        self.log_label = tk.Label(self.log_frame, textvariable=self.log_var)
+        
+        self.log_frame.pack(side="bottom", fill=tk.X)
+        self.log_label.pack(side="bottom")
         
         main_frame.pack()
         
+    def log(self, log_message: str):
+        message = f"Status: {log_message}"
+        LOG.info(log_message)
+        self.log_var.set(message)
 
     def display_image(self, image_path):
         self.current_image_path = image_path
@@ -243,18 +262,18 @@ class Application(tk.Tk):
         self.canvas.create_image(0, 0, anchor=tk.NW, image=self.current_image)
 
     def set_current_filter(self, selected_filter):
-        LOG.info(f"Current filter: {selected_filter}")
+        self.log(f"Current filter: {selected_filter}")
         self.current_filter = selected_filter
 
     def apply_filter(self):
         
         if self.current_image is None\
             or self.current_image_path is None:
-            LOG.info("There is no images")
+            self.log("There are no images")
             return
         
         if self.current_filter is None:
-            LOG.info("Please select a filter")
+            self.log("Please select a filter")
             return
         
         self.clear_tmp_obscurator()
@@ -309,6 +328,7 @@ class Application(tk.Tk):
             return
         
         if self.image_frame is not None:
+            self.log("Please select a filter")
             self.display_image(path)
             
         self.image_input.delete(0, 'end')

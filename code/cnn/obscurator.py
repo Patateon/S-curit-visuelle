@@ -191,7 +191,7 @@ class Application(tk.Tk):
         self.image_frame_controller.pack(side="top")
         
         # Add a canvas
-        self.canvas = tk.Canvas(self.image_frame, width=512, height=512, bg="blue")
+        self.canvas = tk.Canvas(self.image_frame, width=512, height=512, bg="gray")
     
         self.canvas.pack(side="bottom")
         
@@ -228,7 +228,7 @@ class Application(tk.Tk):
         self.filter_controller.pack(side="top")
         
         # Filter canvas
-        self.canvas_out = tk.Canvas(self.filter_frame, width=512, height=512, bg="red")
+        self.canvas_out = tk.Canvas(self.filter_frame, width=512, height=512, bg="gray")
         
         self.canvas_out.pack(side="bottom")
         

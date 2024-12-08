@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
              );
         }
 
-        ColorSpaces::HSL::inverse(img);
+        // ColorSpaces::HSL::inverse(img);
         img.save(argv[2]);
     }
 
